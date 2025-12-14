@@ -1,4 +1,5 @@
-import { ExternalLink, Github } from "lucide-react";
+import { useState } from "react";
+import { ExternalLink, Github, X } from "lucide-react";
 
 const projects = [
   {
@@ -8,7 +9,7 @@ const projects = [
     tags: ["React", "Node.js", "PostgreSQL", "OpenAI"],
     image: "linear-gradient(135deg, hsl(265 89% 40%) 0%, hsl(217 91% 40%) 100%)",
     github: "#",
-    live: "#",
+    live: "https://lovable.dev",
   },
   {
     id: 2,
@@ -17,7 +18,7 @@ const projects = [
     tags: ["Next.js", "Stripe", "Tailwind", "Prisma"],
     image: "linear-gradient(135deg, hsl(217 91% 40%) 0%, hsl(180 70% 35%) 100%)",
     github: "#",
-    live: "#",
+    live: "https://vercel.com",
   },
   {
     id: 3,
@@ -26,7 +27,7 @@ const projects = [
     tags: ["TypeScript", "D3.js", "WebSocket", "Redis"],
     image: "linear-gradient(135deg, hsl(240 60% 35%) 0%, hsl(265 89% 50%) 100%)",
     github: "#",
-    live: "#",
+    live: "https://github.com",
   },
   {
     id: 4,
@@ -35,7 +36,7 @@ const projects = [
     tags: ["React Native", "Firebase", "Expo", "Audio API"],
     image: "linear-gradient(135deg, hsl(265 89% 50%) 0%, hsl(300 70% 40%) 100%)",
     github: "#",
-    live: "#",
+    live: "https://expo.dev",
   },
   {
     id: 5,
@@ -44,7 +45,7 @@ const projects = [
     tags: ["Vue.js", "GraphQL", "MongoDB", "Docker"],
     image: "linear-gradient(135deg, hsl(200 80% 40%) 0%, hsl(217 91% 50%) 100%)",
     github: "#",
-    live: "#",
+    live: "https://supabase.com",
   },
   {
     id: 6,
@@ -53,11 +54,13 @@ const projects = [
     tags: ["Astro", "MDX", "Cloudflare", "Vercel"],
     image: "linear-gradient(135deg, hsl(220 60% 30%) 0%, hsl(265 60% 45%) 100%)",
     github: "#",
-    live: "#",
+    live: "https://astro.build",
   },
 ];
 
 const Projects = () => {
+  const [hoveredProject, setHoveredProject] = useState<number | null>(null);
+
   return (
     <section id="projects" className="py-32 px-6 relative">
       <div className="container mx-auto max-w-6xl">
@@ -70,8 +73,7 @@ const Projects = () => {
             Projetos <span className="text-gradient">Recentes</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Uma seleção dos meus trabalhos mais recentes, demonstrando 
-            versatilidade e atenção aos detalhes.
+            Uma seleção dos meus trabalhos mais recentes. Passe o mouse para ver o preview.
           </p>
         </div>
 
@@ -80,8 +82,10 @@ const Projects = () => {
           {projects.map((project, index) => (
             <article
               key={project.id}
-              className="group glass rounded-2xl overflow-hidden hover:border-primary/30 transition-all duration-500"
+              className="group glass rounded-2xl overflow-hidden hover:border-primary/30 transition-all duration-500 relative"
               style={{ animationDelay: `${index * 0.1}s` }}
+              onMouseEnter={() => setHoveredProject(project.id)}
+              onMouseLeave={() => setHoveredProject(null)}
             >
               {/* Image placeholder */}
               <div 
@@ -95,12 +99,16 @@ const Projects = () => {
                   <a
                     href={project.github}
                     className="p-3 rounded-full bg-background/90 hover:bg-background transition-colors"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <Github className="w-5 h-5" />
                   </a>
                   <a
                     href={project.live}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="p-3 rounded-full bg-background/90 hover:bg-background transition-colors"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <ExternalLink className="w-5 h-5" />
                   </a>
@@ -128,10 +136,59 @@ const Projects = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Floating Preview Window */}
+              {hoveredProject === project.id && (
+                <div 
+                  className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+                  style={{ animation: 'fade-in 0.3s ease-out' }}
+                >
+                  <div 
+                    className="relative w-[80vw] max-w-4xl h-[70vh] rounded-xl overflow-hidden shadow-2xl border border-border/50 bg-card pointer-events-auto"
+                    onMouseLeave={() => setHoveredProject(null)}
+                  >
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-4 py-3 bg-card border-b border-border/50">
+                      <div className="flex items-center gap-3">
+                        <div className="flex gap-1.5">
+                          <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                          <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                          <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                        </div>
+                        <span className="text-sm text-muted-foreground font-medium">
+                          {project.title}
+                        </span>
+                      </div>
+                      <button 
+                        onClick={() => setHoveredProject(null)}
+                        className="p-1 rounded hover:bg-muted transition-colors"
+                      >
+                        <X className="w-4 h-4 text-muted-foreground" />
+                      </button>
+                    </div>
+                    
+                    {/* Iframe */}
+                    <iframe
+                      src={project.live}
+                      className="w-full h-[calc(100%-48px)] bg-white"
+                      title={`Preview de ${project.title}`}
+                      sandbox="allow-scripts allow-same-origin"
+                    />
+                  </div>
+                </div>
+              )}
             </article>
           ))}
         </div>
       </div>
+
+      {/* Backdrop overlay */}
+      {hoveredProject !== null && (
+        <div 
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
+          style={{ animation: 'fade-in 0.3s ease-out' }}
+        />
+      )}
     </section>
   );
 };
