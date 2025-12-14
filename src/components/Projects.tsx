@@ -85,7 +85,6 @@ const Projects = () => {
               className="group glass rounded-2xl overflow-hidden hover:border-primary/30 transition-all duration-500 relative"
               style={{ animationDelay: `${index * 0.1}s` }}
               onMouseEnter={() => setHoveredProject(project.id)}
-              onMouseLeave={() => setHoveredProject(null)}
             >
               {/* Image placeholder */}
               <div 
@@ -145,7 +144,6 @@ const Projects = () => {
                 >
                   <div 
                     className="relative w-[80vw] max-w-4xl h-[70vh] rounded-xl overflow-hidden shadow-2xl border border-border/50 bg-card pointer-events-auto"
-                    onMouseLeave={() => setHoveredProject(null)}
                   >
                     {/* Header */}
                     <div className="flex items-center justify-between px-4 py-3 bg-card border-b border-border/50">
