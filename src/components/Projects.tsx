@@ -144,14 +144,14 @@ const Projects = () => {
                 >
                   <div 
                     className="relative rounded-lg overflow-hidden shadow-2xl pointer-events-auto"
-                    style={{ width: '840px', height: '320px' }}
+                    style={{ width: '1200px', height: '700px' }}
                   >
                     {/* Mac-style Header */}
                     <div className="flex items-center px-3 py-2 bg-[#E8E8E8]">
                       <div className="flex gap-2">
                         <button 
                           onClick={() => setHoveredProject(null)}
-                          className="w-3 h-3 rounded-full bg-[#FF5F57] hover:brightness-90 transition-all"
+                          className="w-3 h-3 rounded-full bg-[#FF5F57] hover:brightness-90 transition-all cursor-pointer"
                         />
                         <div className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
                         <div className="w-3 h-3 rounded-full bg-[#28C840]" />
@@ -164,7 +164,6 @@ const Projects = () => {
                       className="w-full bg-white"
                       style={{ height: 'calc(100% - 28px)' }}
                       title={`Preview de ${project.title}`}
-                      sandbox="allow-scripts allow-same-origin"
                     />
                   </div>
                 </div>
