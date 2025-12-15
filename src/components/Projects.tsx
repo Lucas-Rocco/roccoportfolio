@@ -135,50 +135,51 @@ const Projects = () => {
                   ))}
                 </div>
               </div>
-
-              {/* Floating Preview Window */}
-              {hoveredProject === project.id && (
-                <div 
-                  className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
-                  style={{ animation: 'fade-in 0.3s ease-out' }}
-                >
-                  <div 
-                    className="relative rounded-lg overflow-hidden shadow-2xl pointer-events-auto"
-                    style={{ width: '1200px', height: '700px' }}
-                  >
-                    {/* Mac-style Header */}
-                    <div className="flex items-center px-3 py-2 bg-[#E8E8E8]">
-                      <div className="flex gap-2">
-                        <button 
-                          onClick={() => setHoveredProject(null)}
-                          className="w-3 h-3 rounded-full bg-[#FF5F57] hover:brightness-90 transition-all cursor-pointer"
-                        />
-                        <div className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
-                        <div className="w-3 h-3 rounded-full bg-[#28C840]" />
-                      </div>
-                    </div>
-                    
-                    {/* Iframe */}
-                    <iframe
-                      src={project.live}
-                      className="w-full bg-white"
-                      style={{ height: 'calc(100% - 28px)' }}
-                      title={`Preview de ${project.title}`}
-                    />
-                  </div>
-                </div>
-              )}
             </article>
           ))}
         </div>
       </div>
 
-      {/* Backdrop overlay */}
+      {/* Floating Preview Window - Outside of cards */}
       {hoveredProject !== null && (
-        <div 
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
-          style={{ animation: 'fade-in 0.3s ease-out' }}
-        />
+        <>
+          {/* Backdrop overlay */}
+          <div 
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
+            style={{ animation: 'fade-in 0.3s ease-out' }}
+          />
+          
+          {/* Preview Window */}
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            style={{ animation: 'fade-in 0.3s ease-out' }}
+          >
+            <div 
+              className="relative rounded-lg overflow-hidden shadow-2xl"
+              style={{ width: '1200px', height: '700px' }}
+            >
+              {/* Mac-style Header */}
+              <div className="flex items-center px-3 py-2 bg-[#E8E8E8]">
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => setHoveredProject(null)}
+                    className="w-3 h-3 rounded-full bg-[#FF5F57] hover:brightness-90 transition-all cursor-pointer"
+                  />
+                  <div className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
+                  <div className="w-3 h-3 rounded-full bg-[#28C840]" />
+                </div>
+              </div>
+              
+              {/* Iframe */}
+              <iframe
+                src={projects.find(p => p.id === hoveredProject)?.live}
+                className="w-full bg-white"
+                style={{ height: 'calc(100% - 28px)' }}
+                title={`Preview de ${projects.find(p => p.id === hoveredProject)?.title}`}
+              />
+            </div>
+          </div>
+        </>
       )}
     </section>
   );
