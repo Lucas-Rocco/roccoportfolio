@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Code, Database, Cloud, Palette, Terminal, Layers, Cpu, Globe, Smartphone, Lock } from "lucide-react";
 
 const skills = [
@@ -18,6 +18,25 @@ const skills = [
 
 const Skills = () => {
   const [activeSkill, setActiveSkill] = useState<number | null>(null);
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseEnter = (index: number, e: React.MouseEvent<HTMLDivElement>) => {
+    setActiveSkill(index);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const containerRect = containerRef.current?.getBoundingClientRect();
+    if (containerRect) {
+      setTooltipPos({
+        x: rect.left + rect.width / 2 - containerRect.left,
+        y: rect.top - containerRect.top - 10,
+      });
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setActiveSkill(null);
+    setTooltipPos(null);
+  };
 
   return (
     <section id="skills" className="py-32 px-6 relative overflow-hidden">
@@ -36,7 +55,7 @@ const Skills = () => {
         </div>
 
         {/* Spiral Galaxy Container */}
-        <div className="relative w-full aspect-square max-w-3xl mx-auto">
+        <div ref={containerRef} className="relative w-full aspect-square max-w-3xl mx-auto">
           {/* Central Core - minimal */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 md:w-24 md:h-24">
             <div className="absolute inset-0 rounded-full border border-border/30 bg-card/50 backdrop-blur-sm flex items-center justify-center">
@@ -84,8 +103,8 @@ const Skills = () => {
                   style={{
                     transform: `rotate(${baseAngle}deg) translateX(${orbitRadius}px) rotate(-${baseAngle}deg)`,
                   }}
-                  onMouseEnter={() => setActiveSkill(index)}
-                  onMouseLeave={() => setActiveSkill(null)}
+                  onMouseEnter={(e) => handleMouseEnter(index, e)}
+                  onMouseLeave={handleMouseLeave}
                 >
                   {/* Bubble - clean monochrome */}
                   <div
@@ -106,44 +125,42 @@ const Skills = () => {
                       activeSkill === index ? 'text-primary' : 'text-muted-foreground'
                     }`} />
                   </div>
-
-                  {/* Tooltip - Always above */}
-                  <div
-                    className={`
-                      absolute left-1/2 -translate-x-1/2 bottom-full mb-4
-                      w-44 p-3 rounded-lg
-                      bg-card/95 backdrop-blur-md border border-border/50
-                      shadow-xl transition-all duration-300 pointer-events-none
-                      ${activeSkill === index 
-                        ? 'opacity-100 translate-y-0 visible' 
-                        : 'opacity-0 translate-y-2 invisible'}
-                    `}
-                  >
-                    {/* Arrow */}
-                    <div className="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-3 rotate-45 bg-card/95 border-r border-b border-border/50" />
-                    
-                    <div className="relative">
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-medium text-foreground text-sm">
-                          {skill.name}
-                        </h4>
-                        <span className="text-xs text-muted-foreground">
-                          {skill.level}%
-                        </span>
-                      </div>
-                      <span className="text-xs text-primary/70 mb-2 block">
-                        {skill.category}
-                      </span>
-                      <p className="text-xs text-muted-foreground">
-                        {skill.description}
-                      </p>
-                    </div>
-                  </div>
                 </div>
               </div>
             );
           })}
 
+          {/* Tooltip - Fixed position above bubble */}
+          {activeSkill !== null && tooltipPos && (
+            <div
+              className="absolute w-44 p-3 rounded-lg bg-card/95 backdrop-blur-md border border-border/50 shadow-xl z-[100] pointer-events-none"
+              style={{
+                left: tooltipPos.x,
+                top: tooltipPos.y,
+                transform: 'translate(-50%, -100%)',
+              }}
+            >
+              {/* Arrow */}
+              <div className="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-3 rotate-45 bg-card/95 border-r border-b border-border/50" />
+              
+              <div className="relative">
+                <div className="flex items-center justify-between mb-1">
+                  <h4 className="font-medium text-foreground text-sm">
+                    {skills[activeSkill].name}
+                  </h4>
+                  <span className="text-xs text-muted-foreground">
+                    {skills[activeSkill].level}%
+                  </span>
+                </div>
+                <span className="text-xs text-primary/70 mb-2 block">
+                  {skills[activeSkill].category}
+                </span>
+                <p className="text-xs text-muted-foreground">
+                  {skills[activeSkill].description}
+                </p>
+              </div>
+            </div>
+          )}
           {/* Minimal floating particles */}
           {[...Array(10)].map((_, i) => (
             <div
