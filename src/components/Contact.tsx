@@ -1,5 +1,12 @@
 import { Mail, MapPin, Send, Phone } from "lucide-react";
 import { useState } from "react";
+import { z } from "zod";
+
+const contactSchema = z.object({
+  name: z.string().trim().min(2, "Nome deve ter pelo menos 2 caracteres").max(100, "Nome deve ter no máximo 100 caracteres"),
+  email: z.string().trim().email("Email inválido").max(255, "Email deve ter no máximo 255 caracteres"),
+  message: z.string().trim().min(10, "Mensagem deve ter pelo menos 10 caracteres").max(1000, "Mensagem deve ter no máximo 1000 caracteres"),
+});
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -7,11 +14,22 @@ const Contact = () => {
     email: "",
     message: "",
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted:", formData);
+    const result = contactSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+    setErrors({});
+    // Process validated data
+    setFormData({ name: "", email: "", message: "" });
   };
 
   return (
@@ -89,7 +107,9 @@ const Contact = () => {
                 className="w-full px-4 py-3 rounded-xl glass border-border focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none transition-all duration-300 bg-transparent"
                 placeholder="Seu nome"
                 required
+                maxLength={100}
               />
+              {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name}</p>}
             </div>
 
             <div>
@@ -104,7 +124,9 @@ const Contact = () => {
                 className="w-full px-4 py-3 rounded-xl glass border-border focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none transition-all duration-300 bg-transparent"
                 placeholder="seu@email.com"
                 required
+                maxLength={255}
               />
+              {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
             </div>
 
             <div>
@@ -119,7 +141,9 @@ const Contact = () => {
                 className="w-full px-4 py-3 rounded-xl glass border-border focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none transition-all duration-300 bg-transparent resize-none"
                 placeholder="Conte-me sobre seu projeto..."
                 required
+                maxLength={1000}
               />
+              {errors.message && <p className="text-red-400 text-sm mt-1">{errors.message}</p>}
             </div>
 
             <button
