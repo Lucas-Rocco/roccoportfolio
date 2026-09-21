@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, ExternalLink, Github, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import MonitorIADashboard from "@/components/MonitorIADashboard";
 import portfolioSiteDesktop from "@/assets/projects/portfolio-site-desktop.png";
 import roccoPortfolioDesktop from "@/assets/projects/rocco-portfolio-desktop.png";
 
@@ -18,6 +19,7 @@ type Project = {
   area: string;
   image: string;
   previewImage?: string;
+  desktopApp?: boolean;
   github: string;
   live?: string;
   featured?: boolean;
@@ -37,6 +39,7 @@ const projects: Project[] = [
     area: "Visão Computacional",
     image: "linear-gradient(135deg, hsl(265 89% 40%) 0%, hsl(217 91% 40%) 100%)",
     github: "https://github.com/Lucas-Rocco/MonitorIA",
+    desktopApp: true,
     featured: true,
   },
   {
@@ -198,7 +201,7 @@ const Projects = () => {
               key={project.id}
               tabIndex={0}
               onMouseEnter={() => {
-                if (project.live && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+                if ((project.live || project.desktopApp) && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
                   setPreviewProject(project);
                 }
               }}
@@ -302,7 +305,7 @@ const Projects = () => {
         </div>
       </div>
 
-      {previewProject?.live && (
+      {previewProject && (previewProject.live || previewProject.desktopApp) && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-background/85 p-4 backdrop-blur-md animate-[fade-in_300ms_ease-out]"
           role="dialog"
@@ -331,11 +334,17 @@ const Projects = () => {
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <iframe
-              src={previewProject.live}
-              className="h-[calc(100%_-_2.25rem)] w-full bg-background"
-              title={`Preview interativo de ${previewProject.title}`}
-            />
+            <div className="h-[calc(100%_-_2.25rem)] w-full bg-background">
+              {previewProject.desktopApp ? (
+                <MonitorIADashboard />
+              ) : previewProject.live ? (
+                <iframe
+                  src={previewProject.live}
+                  className="h-full w-full bg-background"
+                  title={`Preview interativo de ${previewProject.title}`}
+                />
+              ) : null}
+            </div>
           </div>
         </div>
       )}
