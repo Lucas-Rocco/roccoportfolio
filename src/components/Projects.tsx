@@ -115,6 +115,7 @@ const projects: Project[] = [
 const Projects = () => {
   const [activeFilter, setActiveFilter] = useState<Filter>("Todos");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [previewProject, setPreviewProject] = useState<Project | null>(null);
 
   const filteredProjects = useMemo(
     () =>
@@ -186,6 +187,9 @@ const Projects = () => {
             <article
               key={project.id}
               tabIndex={0}
+              onMouseEnter={() => {
+                if (project.live) setPreviewProject(project);
+              }}
               onClick={() => setSelectedProject(project)}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
@@ -276,6 +280,44 @@ const Projects = () => {
           </Button>
         </div>
       </div>
+
+      {previewProject?.live && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/85 p-4 backdrop-blur-md animate-[fade-in_300ms_ease-out]"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Preview interativo de ${previewProject.title}`}
+        >
+          <div className="h-[min(700px,88vh)] w-[min(1200px,94vw)] overflow-hidden rounded-lg border border-border bg-card shadow-[var(--shadow-float)] animate-[scale-in_300ms_ease-out]">
+            <div className="flex h-9 items-center justify-between bg-muted px-3">
+              <div className="flex items-center gap-2" aria-hidden="true">
+                <span className="h-3 w-3 rounded-full bg-destructive" />
+                <span className="h-3 w-3 rounded-full bg-primary" />
+                <span className="h-3 w-3 rounded-full bg-accent" />
+              </div>
+              <span className="max-w-[60%] truncate text-xs text-muted-foreground">
+                {previewProject.title}
+              </span>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-7 w-7 rounded-full"
+                onClick={() => setPreviewProject(null)}
+                aria-label="Fechar preview interativo"
+                autoFocus
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <iframe
+              src={previewProject.live}
+              className="h-[calc(100%-2.25rem)] w-full bg-background"
+              title={`Preview interativo de ${previewProject.title}`}
+            />
+          </div>
+        </div>
+      )}
 
       {selectedProject && (
         <div
