@@ -126,10 +126,13 @@ const Projects = () => {
   );
 
   useEffect(() => {
-    if (!selectedProject) return;
+    if (!selectedProject && !previewProject) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setSelectedProject(null);
+      if (event.key === "Escape") {
+        setPreviewProject(null);
+        setSelectedProject(null);
+      }
     };
 
     const previousOverflow = document.body.style.overflow;
@@ -140,7 +143,7 @@ const Projects = () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedProject]);
+  }, [selectedProject, previewProject]);
 
   return (
     <section id="projects" className="py-32 px-6 relative">
@@ -188,7 +191,9 @@ const Projects = () => {
               key={project.id}
               tabIndex={0}
               onMouseEnter={() => {
-                if (project.live) setPreviewProject(project);
+                if (project.live && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+                  setPreviewProject(project);
+                }
               }}
               onClick={() => setSelectedProject(project)}
               onKeyDown={(event) => {
@@ -312,7 +317,7 @@ const Projects = () => {
             </div>
             <iframe
               src={previewProject.live}
-              className="h-[calc(100%-2.25rem)] w-full bg-background"
+              className="h-[calc(100%_-_2.25rem)] w-full bg-background"
               title={`Preview interativo de ${previewProject.title}`}
             />
           </div>
