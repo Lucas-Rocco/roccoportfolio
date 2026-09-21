@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowUpRight, ExternalLink, Github, Star, X } from "lucide-react";
+import { ArrowDown, ArrowUpRight, ExternalLink, Github, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import MonitorIADashboard from "@/components/MonitorIADashboard";
@@ -32,6 +32,50 @@ const filters: Filter[] = ["Todos", "Automação", "IA", "Desenvolvimento Web"];
 
 const projects: Project[] = [
   {
+    id: 8,
+    title: "Gorillaz Burguer",
+    shortDescription: "Landing page completa para hamburgueria artesanal.",
+    description:
+      "Site institucional para hamburgueria com cardápio digital interativo, montagem de pedidos, unidades, contato e área de login.",
+    categories: ["Desenvolvimento Web"],
+    technologies: ["React", "TypeScript", "Tailwind"],
+    area: "Sistemas",
+    image: "linear-gradient(135deg, hsl(25 90% 35%) 0%, hsl(265 89% 40%) 100%)",
+    previewImage: gorillazBurguerDesktop,
+    github: "https://github.com/Lucas-Rocco",
+    live: "https://gorillaz-burguers.lovable.app",
+    featured: true,
+  },
+  {
+    id: 9,
+    title: "Level Up Your Life",
+    shortDescription: "Organização pessoal gamificada estilo Solo Leveling.",
+    description:
+      "Aplicativo de produtividade gamificado com visual dark futurista, sistema de níveis e missões para evolução pessoal contínua.",
+    categories: ["Desenvolvimento Web"],
+    technologies: ["React", "TypeScript", "Tailwind"],
+    area: "Produtividade",
+    image: "linear-gradient(135deg, hsl(0 80% 40%) 0%, hsl(25 90% 45%) 100%)",
+    previewImage: levelUpYourLifeDesktop,
+    github: "https://github.com/Lucas-Rocco",
+    live: "https://roccoevoup.lovable.app",
+    featured: true,
+  },
+  {
+    id: 10,
+    title: "Urban Flow Live",
+    shortDescription: "Mapa vivo da mobilidade urbana em tempo real.",
+    description:
+      "Plataforma inteligente de transporte público com mapa ao vivo, linhas e informações de mobilidade urbana em tempo real.",
+    categories: ["Desenvolvimento Web"],
+    technologies: ["React", "TypeScript", "Mapas"],
+    area: "Sistemas",
+    image: "linear-gradient(135deg, hsl(217 91% 45%) 0%, hsl(265 89% 55%) 100%)",
+    github: "https://github.com/Lucas-Rocco",
+    live: "https://urban-flow.lovable.app",
+    featured: true,
+  },
+  {
     id: 1,
     title: "MonitorIA",
     shortDescription: "Monitor inteligente guiado por visão computacional.",
@@ -44,7 +88,6 @@ const projects: Project[] = [
     previewImage: monitorIADesktop,
     github: "https://github.com/Lucas-Rocco/MonitorIA",
     desktopApp: true,
-    featured: true,
   },
   {
     id: 2,
@@ -59,7 +102,6 @@ const projects: Project[] = [
     previewImage: roccoPortfolioDesktop,
     github: "https://github.com/Lucas-Rocco/roccoportfolio",
     live: "https://roccoportfolio.lovable.app",
-    featured: true,
   },
   {
     id: 3,
@@ -74,7 +116,6 @@ const projects: Project[] = [
     previewImage: portfolioSiteDesktop,
     github: "https://github.com/Lucas-Rocco/Portfolio-Site",
     live: "https://lucas-rocco.github.io/Portfolio-Site/",
-    featured: true,
   },
   {
     id: 4,
@@ -124,51 +165,13 @@ const projects: Project[] = [
     image: "linear-gradient(135deg, hsl(280 70% 35%) 0%, hsl(217 91% 45%) 100%)",
     github: "https://github.com/Lucas-Rocco/CHATBOT",
   },
-  {
-    id: 8,
-    title: "Gorillaz Burguer",
-    shortDescription: "Landing page completa para hamburgueria artesanal.",
-    description:
-      "Site institucional para hamburgueria com cardápio digital interativo, montagem de pedidos, unidades, contato e área de login.",
-    categories: ["Desenvolvimento Web"],
-    technologies: ["React", "TypeScript", "Tailwind"],
-    area: "Sistemas",
-    image: "linear-gradient(135deg, hsl(25 90% 35%) 0%, hsl(265 89% 40%) 100%)",
-    previewImage: gorillazBurguerDesktop,
-    github: "https://github.com/Lucas-Rocco",
-    live: "https://gorillaz-burguers.lovable.app",
-  },
-  {
-    id: 9,
-    title: "Level Up Your Life",
-    shortDescription: "Organização pessoal gamificada estilo Solo Leveling.",
-    description:
-      "Aplicativo de produtividade gamificado com visual dark futurista, sistema de níveis e missões para evolução pessoal contínua.",
-    categories: ["Desenvolvimento Web"],
-    technologies: ["React", "TypeScript", "Tailwind"],
-    area: "Produtividade",
-    image: "linear-gradient(135deg, hsl(0 80% 40%) 0%, hsl(25 90% 45%) 100%)",
-    previewImage: levelUpYourLifeDesktop,
-    github: "https://github.com/Lucas-Rocco",
-    live: "https://roccoevoup.lovable.app",
-  },
-  {
-    id: 10,
-    title: "Urban Flow Live",
-    shortDescription: "Mapa vivo da mobilidade urbana em tempo real.",
-    description:
-      "Plataforma inteligente de transporte público com mapa ao vivo, linhas e informações de mobilidade urbana em tempo real.",
-    categories: ["Desenvolvimento Web"],
-    technologies: ["React", "TypeScript", "Mapas"],
-    area: "Sistemas",
-    image: "linear-gradient(135deg, hsl(217 91% 45%) 0%, hsl(265 89% 55%) 100%)",
-    github: "https://github.com/Lucas-Rocco",
-    live: "https://urban-flow.lovable.app",
-  },
 ];
+
+const VISIBLE_COUNT = 3;
 
 const Projects = () => {
   const [activeFilter, setActiveFilter] = useState<Filter>("Todos");
+  const [showAll, setShowAll] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [previewProject, setPreviewProject] = useState<Project | null>(null);
 
@@ -179,6 +182,16 @@ const Projects = () => {
         : projects.filter((project) => project.categories.includes(activeFilter)),
     [activeFilter],
   );
+
+  const visibleProjects = useMemo(
+    () => (showAll ? filteredProjects : filteredProjects.slice(0, VISIBLE_COUNT)),
+    [filteredProjects, showAll],
+  );
+
+  const handleFilterChange = (filter: Filter) => {
+    setActiveFilter(filter);
+    setShowAll(false);
+  };
 
   useEffect(() => {
     if (!selectedProject && !previewProject) return;
@@ -225,7 +238,7 @@ const Projects = () => {
               size="sm"
               variant={activeFilter === filter ? "default" : "outline"}
               aria-pressed={activeFilter === filter}
-              onClick={() => setActiveFilter(filter)}
+              onClick={() => handleFilterChange(filter)}
               className={cn(
                 "rounded-full px-4 transition-all duration-300",
                 activeFilter !== filter && "bg-card/40 text-muted-foreground hover:text-foreground",
@@ -241,7 +254,7 @@ const Projects = () => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fade-in_300ms_ease-out]"
           aria-live="polite"
         >
-          {filteredProjects.map((project) => (
+          {visibleProjects.map((project) => (
             <article
               key={project.id}
               tabIndex={0}
@@ -340,7 +353,29 @@ const Projects = () => {
           ))}
         </div>
 
-        <div className="text-center mt-12">
+        {filteredProjects.length > VISIBLE_COUNT && (
+          <div className="mt-12 text-center">
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-full bg-card/40 border-primary/30"
+              aria-expanded={showAll}
+              onClick={() => setShowAll((value) => !value)}
+            >
+              {showAll ? (
+                <>
+                  <ArrowUpRight className="h-4 w-4" /> Ver menos
+                </>
+              ) : (
+                <>
+                  <ArrowDown className="h-4 w-4" /> Ver mais projetos ({filteredProjects.length - VISIBLE_COUNT})
+                </>
+              )}
+            </Button>
+          </div>
+        )}
+
+        <div className="text-center mt-6">
           <Button asChild variant="outline" className="rounded-full bg-card/40 border-primary/30">
             <a href="https://github.com/Lucas-Rocco" target="_blank" rel="noopener noreferrer">
               <Github className="w-4 h-4" />
