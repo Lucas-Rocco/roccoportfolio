@@ -124,6 +124,47 @@ const projects: Project[] = [
     image: "linear-gradient(135deg, hsl(280 70% 35%) 0%, hsl(217 91% 45%) 100%)",
     github: "https://github.com/Lucas-Rocco/CHATBOT",
   },
+  {
+    id: 8,
+    title: "Gorillaz Burguer",
+    shortDescription: "Landing page completa para hamburgueria artesanal.",
+    description:
+      "Site institucional para hamburgueria com cardápio digital interativo, montagem de pedidos, unidades, contato e área de login.",
+    categories: ["Desenvolvimento Web"],
+    technologies: ["React", "TypeScript", "Tailwind"],
+    area: "Sistemas",
+    image: "linear-gradient(135deg, hsl(25 90% 35%) 0%, hsl(265 89% 40%) 100%)",
+    previewImage: gorillazBurguerDesktop,
+    github: "https://github.com/Lucas-Rocco",
+    live: "https://gorillaz-burguers.lovable.app",
+  },
+  {
+    id: 9,
+    title: "Level Up Your Life",
+    shortDescription: "Organização pessoal gamificada estilo Solo Leveling.",
+    description:
+      "Aplicativo de produtividade gamificado com visual dark futurista, sistema de níveis e missões para evolução pessoal contínua.",
+    categories: ["Desenvolvimento Web"],
+    technologies: ["React", "TypeScript", "Tailwind"],
+    area: "Produtividade",
+    image: "linear-gradient(135deg, hsl(0 80% 40%) 0%, hsl(25 90% 45%) 100%)",
+    previewImage: levelUpYourLifeDesktop,
+    github: "https://github.com/Lucas-Rocco",
+    live: "https://roccoevoup.lovable.app",
+  },
+  {
+    id: 10,
+    title: "Urban Flow Live",
+    shortDescription: "Mapa vivo da mobilidade urbana em tempo real.",
+    description:
+      "Plataforma inteligente de transporte público com mapa ao vivo, linhas e informações de mobilidade urbana em tempo real.",
+    categories: ["Desenvolvimento Web"],
+    technologies: ["React", "TypeScript", "Mapas"],
+    area: "Sistemas",
+    image: "linear-gradient(135deg, hsl(217 91% 45%) 0%, hsl(265 89% 55%) 100%)",
+    github: "https://github.com/Lucas-Rocco",
+    live: "https://urban-flow.lovable.app",
+  },
 ];
 
 const Projects = () => {
