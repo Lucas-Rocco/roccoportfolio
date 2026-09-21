@@ -3,6 +3,7 @@ import { ArrowUpRight, ExternalLink, Github, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import MonitorIADashboard from "@/components/MonitorIADashboard";
+import monitorIADesktop from "@/assets/projects/monitor-ia-desktop.png";
 import portfolioSiteDesktop from "@/assets/projects/portfolio-site-desktop.png";
 import roccoPortfolioDesktop from "@/assets/projects/rocco-portfolio-desktop.png";
 
@@ -38,6 +39,7 @@ const projects: Project[] = [
     technologies: ["Python", "C++", "OpenCV"],
     area: "Visão Computacional",
     image: "linear-gradient(135deg, hsl(265 89% 40%) 0%, hsl(217 91% 40%) 100%)",
+    previewImage: monitorIADesktop,
     github: "https://github.com/Lucas-Rocco/MonitorIA",
     desktopApp: true,
     featured: true,
