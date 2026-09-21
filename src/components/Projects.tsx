@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, ExternalLink, Github, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import portfolioSiteDesktop from "@/assets/projects/portfolio-site-desktop.png";
+import roccoPortfolioDesktop from "@/assets/projects/rocco-portfolio-desktop.png";
 
 type Category = "Automação" | "IA" | "Desenvolvimento Web";
 type Filter = "Todos" | Category;
@@ -15,6 +17,7 @@ type Project = {
   technologies: string[];
   area: string;
   image: string;
+  previewImage?: string;
   github: string;
   live?: string;
   featured?: boolean;
@@ -46,8 +49,10 @@ const projects: Project[] = [
     technologies: ["TypeScript", "React", "Tailwind", "Vite"],
     area: "Sistemas",
     image: "linear-gradient(135deg, hsl(217 91% 40%) 0%, hsl(180 70% 35%) 100%)",
+    previewImage: roccoPortfolioDesktop,
     github: "https://github.com/Lucas-Rocco/roccoportfolio",
     live: "https://roccoportfolio.lovable.app",
+    featured: true,
   },
   {
     id: 3,
@@ -59,8 +64,10 @@ const projects: Project[] = [
     technologies: ["HTML", "CSS", "JavaScript"],
     area: "Sistemas",
     image: "linear-gradient(135deg, hsl(240 60% 35%) 0%, hsl(265 89% 50%) 100%)",
+    previewImage: portfolioSiteDesktop,
     github: "https://github.com/Lucas-Rocco/Portfolio-Site",
-    live: "https://lucasrocco.github.io",
+    live: "https://lucas-rocco.github.io/Portfolio-Site/",
+    featured: true,
   },
   {
     id: 4,
@@ -206,7 +213,7 @@ const Projects = () => {
                 "group relative min-h-[430px] cursor-pointer overflow-hidden rounded-2xl border border-border/60 bg-card/50 backdrop-blur-sm",
                 "transition-[transform,border-color,box-shadow] duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 "md:hover:z-20 md:hover:scale-[1.03] md:hover:border-primary/40 md:hover:shadow-[var(--shadow-glow)]",
-                project.featured && "md:col-span-2 lg:col-span-2 border-primary/25",
+                project.featured && "border-primary/25",
               )}
               aria-label={`Abrir detalhes do projeto ${project.title}`}
             >
@@ -217,13 +224,22 @@ const Projects = () => {
                 )}
                 style={{ background: project.image }}
               >
+                {project.previewImage && (
+                  <img
+                    src={project.previewImage}
+                    alt={`Tela desktop do projeto ${project.title}`}
+                    className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-[1.03]"
+                  />
+                )}
                 <div className="absolute inset-0 bg-background/20 transition-colors duration-300 group-hover:bg-transparent" />
                 <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-50 transition-opacity duration-300 group-hover:opacity-80" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="font-display text-3xl font-bold text-primary-foreground/20 uppercase tracking-widest">
-                    {project.title}
-                  </span>
-                </div>
+                {!project.previewImage && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="font-display text-3xl font-bold text-primary-foreground/20 uppercase tracking-widest">
+                      {project.title}
+                    </span>
+                  </div>
+                )}
                 {project.featured && (
                   <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full border border-primary/30 bg-background/70 px-3 py-1 text-xs font-medium text-primary backdrop-blur-md">
                     <Star className="h-3 w-3" aria-hidden="true" /> Destaque
