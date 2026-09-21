@@ -6,6 +6,8 @@ import MonitorIADashboard from "@/components/MonitorIADashboard";
 import monitorIADesktop from "@/assets/projects/monitor-ia-desktop.png";
 import portfolioSiteDesktop from "@/assets/projects/portfolio-site-desktop.png";
 import roccoPortfolioDesktop from "@/assets/projects/rocco-portfolio-desktop.png";
+import gorillazBurguerDesktop from "@/assets/projects/gorillaz-burguer-desktop.png";
+import levelUpYourLifeDesktop from "@/assets/projects/level-up-your-life-desktop.png";
 
 type Category = "Automação" | "IA" | "Desenvolvimento Web";
 type Filter = "Todos" | Category;
