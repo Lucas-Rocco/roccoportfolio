@@ -115,6 +115,30 @@
   transform-origin: 0 0;
 }
 
+@keyframes orbit-reverse {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.roulette-spin {
+  animation: orbit 90s linear infinite;
+}
+
+.roulette-counter-spin {
+  animation: orbit-reverse 90s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roulette-spin,
+  .roulette-counter-spin {
+    animation: none;
+  }
+}
+
 @keyframes pulse-glow {
   0%, 100% {
     opacity: 0.4;
