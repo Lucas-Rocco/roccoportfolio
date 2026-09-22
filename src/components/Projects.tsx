@@ -426,8 +426,8 @@ const Projects = () => {
           <div
             className={cn("roulette-spin absolute inset-0", rouletteHoveredId !== null && "[animation-play-state:paused]")}
           >
-            {projects.map((project) => {
-              const visible = filteredIds.has(project.id);
+            {rouletteProjects.map((project) => {
+              const visible = rouletteIds.has(project.id);
               const angle = rouletteAngles.get(project.id) ?? 0;
               const hovered = rouletteHoveredId === project.id;
 
