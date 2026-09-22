@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDown, ArrowUpRight, ExternalLink, Github, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -174,6 +174,8 @@ const Projects = () => {
   const [showAll, setShowAll] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [previewProject, setPreviewProject] = useState<Project | null>(null);
+  const [rouletteHoveredId, setRouletteHoveredId] = useState<number | null>(null);
+  const hoverTimerRef = useRef<number | null>(null);
 
   const filteredProjects = useMemo(
     () =>
@@ -192,6 +194,39 @@ const Projects = () => {
     setActiveFilter(filter);
     setShowAll(false);
   };
+
+  const filteredIds = useMemo(() => new Set(filteredProjects.map((project) => project.id)), [filteredProjects]);
+
+  const rouletteAngles = useMemo(() => {
+    const angles = new Map<number, number>();
+    projects.forEach((project, index) => angles.set(project.id, (index / projects.length) * 360));
+    filteredProjects.forEach((project, index) =>
+      angles.set(project.id, (index / filteredProjects.length) * 360),
+    );
+    return angles;
+  }, [filteredProjects]);
+
+  const clearRouletteTimer = () => {
+    if (hoverTimerRef.current) {
+      window.clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+  };
+
+  const handleRouletteEnter = (project: Project) => {
+    setRouletteHoveredId(project.id);
+    clearRouletteTimer();
+    if ((project.live || project.desktopApp) && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      hoverTimerRef.current = window.setTimeout(() => setPreviewProject(project), 700);
+    }
+  };
+
+  const handleRouletteLeave = () => {
+    clearRouletteTimer();
+    setRouletteHoveredId(null);
+  };
+
+  useEffect(() => () => clearRouletteTimer(), []);
 
   useEffect(() => {
     if (!selectedProject && !previewProject) return;
@@ -227,7 +262,7 @@ const Projects = () => {
         </div>
 
         <div
-          className="flex flex-wrap justify-center gap-2 mb-12"
+          className="flex flex-wrap justify-center gap-2 mb-12 md:hidden"
           role="group"
           aria-label="Filtrar projetos por categoria"
         >
@@ -249,6 +284,7 @@ const Projects = () => {
           ))}
         </div>
 
+        <div className="md:hidden">
         <div
           key={activeFilter}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fade-in_300ms_ease-out]"
@@ -374,6 +410,135 @@ const Projects = () => {
             </Button>
           </div>
         )}
+        </div>
+
+        {/* Roleta de projetos (desktop / tablet) */}
+        <div className="relative mx-auto hidden aspect-square w-full max-w-[780px] md:block">
+          <div className="pointer-events-none absolute inset-[12%] rounded-full border border-border/20" aria-hidden="true" />
+          <div className="pointer-events-none absolute inset-[24%] rounded-full border border-dashed border-border/10" aria-hidden="true" />
+          <div className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle,hsl(var(--primary)/0.08)_0%,transparent_60%)]" aria-hidden="true" />
+
+          <div
+            className={cn("roulette-spin absolute inset-0", rouletteHoveredId !== null && "[animation-play-state:paused]")}
+          >
+            {projects.map((project) => {
+              const visible = filteredIds.has(project.id);
+              const angle = rouletteAngles.get(project.id) ?? 0;
+              const hovered = rouletteHoveredId === project.id;
+
+              return (
+                <div
+                  key={project.id}
+                  className={cn(
+                    "pointer-events-none absolute inset-0 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                    hovered ? "z-30" : "z-10",
+                  )}
+                  style={{ transform: `rotate(${angle}deg)` }}
+                >
+                  <div className="absolute left-1/2 top-[12%] -translate-x-1/2 -translate-y-1/2">
+                    <div
+                      className="transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                      style={{ transform: `rotate(${-angle}deg)` }}
+                    >
+                      <div
+                        className={cn(
+                          "roulette-counter-spin",
+                          rouletteHoveredId !== null && "[animation-play-state:paused]",
+                        )}
+                      >
+                        <button
+                          type="button"
+                          tabIndex={visible ? 0 : -1}
+                          aria-hidden={!visible}
+                          aria-label={`Abrir detalhes do projeto ${project.title}`}
+                          onMouseEnter={() => handleRouletteEnter(project)}
+                          onMouseLeave={handleRouletteLeave}
+                          onFocus={() => setRouletteHoveredId(project.id)}
+                          onBlur={handleRouletteLeave}
+                          onClick={() => {
+                            clearRouletteTimer();
+                            setSelectedProject(project);
+                          }}
+                          className={cn(
+                            "group relative block w-36 overflow-hidden rounded-xl border bg-card/70 text-left backdrop-blur-md",
+                            "transition-[opacity,transform,border-color,box-shadow] duration-500 ease-out",
+                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                            visible ? "pointer-events-auto opacity-100 scale-100" : "pointer-events-none opacity-0 scale-50",
+                            project.featured ? "border-primary/30" : "border-border/60",
+                            hovered && "scale-110 border-primary/60 shadow-[var(--shadow-glow)]",
+                          )}
+                        >
+                          <div className="relative h-20 overflow-hidden" style={{ background: project.image }}>
+                            {project.previewImage ? (
+                              <img
+                                src={project.previewImage}
+                                alt=""
+                                loading="lazy"
+                                className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                              />
+                            ) : (
+                              <span className="absolute inset-0 flex items-center justify-center px-2 text-center font-display text-xs font-bold uppercase tracking-widest text-primary-foreground/30">
+                                {project.title}
+                              </span>
+                            )}
+                            <div className="absolute inset-0 bg-gradient-to-t from-card/80 via-transparent to-transparent" />
+                            {project.featured && (
+                              <span className="absolute left-1.5 top-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full border border-primary/30 bg-background/70 text-primary backdrop-blur-md">
+                                <Star className="h-2.5 w-2.5" aria-hidden="true" />
+                              </span>
+                            )}
+                          </div>
+                          <div className="p-2.5">
+                            <p className="truncate font-display text-sm font-semibold text-foreground transition-colors group-hover:text-primary">
+                              {project.title}
+                            </p>
+                            <p className="mt-0.5 truncate text-[10px] font-medium text-primary/80">
+                              {project.categories.join(" · ")}
+                            </p>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Centro: título + filtros */}
+          <div className="absolute inset-[31%] z-20 flex flex-col items-center justify-center rounded-full border border-primary/20 bg-card/60 p-6 text-center shadow-[var(--shadow-card)] backdrop-blur-xl">
+            <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-muted-foreground">Portfolio</span>
+            <p className="mt-1 font-display text-2xl font-bold text-gradient">Projetos</p>
+            <div
+              className="mt-4 flex w-full max-w-[190px] flex-col gap-1.5"
+              role="group"
+              aria-label="Filtrar projetos por categoria"
+            >
+              {filters.map((filter) => (
+                <Button
+                  key={filter}
+                  type="button"
+                  size="sm"
+                  variant={activeFilter === filter ? "default" : "outline"}
+                  aria-pressed={activeFilter === filter}
+                  onClick={() => handleFilterChange(filter)}
+                  className={cn(
+                    "h-8 rounded-full text-xs transition-all duration-300",
+                    activeFilter !== filter && "bg-card/40 text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {filter}
+                </Button>
+              ))}
+            </div>
+            <p className="mt-3 text-[11px] text-muted-foreground" aria-live="polite">
+              {filteredProjects.length} {filteredProjects.length === 1 ? "projeto" : "projetos"}
+            </p>
+          </div>
+        </div>
+        <p className="mt-4 hidden text-center text-xs text-muted-foreground md:block">
+          Passe o mouse sobre um projeto para pausar a roleta e abrir a prévia.
+        </p>
 
         <div className="text-center mt-6">
           <Button asChild variant="outline" className="rounded-full bg-card/40 border-primary/30">
