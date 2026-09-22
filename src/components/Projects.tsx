@@ -463,9 +463,10 @@ const Projects = () => {
                             "group relative block w-36 overflow-hidden rounded-xl border bg-card/70 text-left backdrop-blur-md",
                             "transition-[opacity,transform,border-color,box-shadow] duration-500 ease-out",
                             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                            visible ? "pointer-events-auto opacity-100 scale-100" : "pointer-events-none opacity-0 scale-50",
+                            visible ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0 scale-50",
+                            visible && (hovered ? "scale-110" : "scale-100"),
                             project.featured ? "border-primary/30" : "border-border/60",
-                            hovered && "scale-110 border-primary/60 shadow-[var(--shadow-glow)]",
+                            hovered && "border-primary/60 shadow-[var(--shadow-glow)]",
                           )}
                         >
                           <div className="relative h-20 overflow-hidden" style={{ background: project.image }}>
