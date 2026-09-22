@@ -418,7 +418,7 @@ const Projects = () => {
         </div>
 
         {/* Roleta de projetos (desktop / tablet) */}
-        <div className="relative mx-auto hidden aspect-square w-full max-w-[780px] md:block">
+        <div className="relative mx-auto hidden aspect-square w-full max-w-[880px] md:block">
           <div className="pointer-events-none absolute inset-[12%] rounded-full border border-border/20" aria-hidden="true" />
           <div className="pointer-events-none absolute inset-[24%] rounded-full border border-dashed border-border/10" aria-hidden="true" />
           <div className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle,hsl(var(--primary)/0.08)_0%,transparent_60%)]" aria-hidden="true" />
@@ -465,7 +465,7 @@ const Projects = () => {
                             setSelectedProject(project);
                           }}
                           className={cn(
-                            "group relative block w-36 overflow-hidden rounded-xl border bg-card/70 text-left backdrop-blur-md",
+                            "group relative block w-44 overflow-hidden rounded-xl border bg-card/70 text-left backdrop-blur-md",
                             "transition-[opacity,transform,border-color,box-shadow] duration-500 ease-out",
                             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                             visible ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0 scale-50",
@@ -474,7 +474,7 @@ const Projects = () => {
                             hovered && "border-primary/60 shadow-[var(--shadow-glow)]",
                           )}
                         >
-                          <div className="relative h-20 overflow-hidden" style={{ background: project.image }}>
+                          <div className="relative h-24 overflow-hidden" style={{ background: project.image }}>
                             {project.previewImage ? (
                               <img
                                 src={project.previewImage}
@@ -538,7 +538,9 @@ const Projects = () => {
               ))}
             </div>
             <p className="mt-3 text-[11px] text-muted-foreground" aria-live="polite">
-              {filteredProjects.length} {filteredProjects.length === 1 ? "projeto" : "projetos"}
+              {filteredProjects.length > ROULETTE_MAX
+                ? `${ROULETTE_MAX} de ${filteredProjects.length} projetos`
+                : `${filteredProjects.length} ${filteredProjects.length === 1 ? "projeto" : "projetos"}`}
             </p>
           </div>
         </div>
