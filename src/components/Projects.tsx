@@ -168,6 +168,7 @@ const projects: Project[] = [
 ];
 
 const VISIBLE_COUNT = 3;
+const ROULETTE_MAX = 6;
 
 const Projects = () => {
   const [activeFilter, setActiveFilter] = useState<Filter>("Todos");
@@ -195,16 +196,20 @@ const Projects = () => {
     setShowAll(false);
   };
 
-  const filteredIds = useMemo(() => new Set(filteredProjects.map((project) => project.id)), [filteredProjects]);
+  const rouletteProjects = useMemo(
+    () => filteredProjects.slice(0, ROULETTE_MAX),
+    [filteredProjects],
+  );
+
+  const rouletteIds = useMemo(() => new Set(rouletteProjects.map((project) => project.id)), [rouletteProjects]);
 
   const rouletteAngles = useMemo(() => {
     const angles = new Map<number, number>();
-    projects.forEach((project, index) => angles.set(project.id, (index / projects.length) * 360));
-    filteredProjects.forEach((project, index) =>
-      angles.set(project.id, (index / filteredProjects.length) * 360),
+    rouletteProjects.forEach((project, index) =>
+      angles.set(project.id, (index / rouletteProjects.length) * 360),
     );
     return angles;
-  }, [filteredProjects]);
+  }, [rouletteProjects]);
 
   const clearRouletteTimer = () => {
     if (hoverTimerRef.current) {
