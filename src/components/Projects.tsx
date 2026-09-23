@@ -655,6 +655,13 @@ const Projects = () => {
             </Button>
 
             <div className="relative min-h-64 overflow-hidden md:min-h-[520px]" style={{ background: selectedProject.image }}>
+              {selectedProject.previewImage && (
+                <img
+                  src={selectedProject.previewImage}
+                  alt={`Tela desktop do projeto ${selectedProject.title}`}
+                  className="absolute inset-0 h-full w-full object-cover object-top"
+                />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-background/10" />
               <span className="absolute bottom-8 left-8 font-display text-3xl font-bold text-primary-foreground/30 uppercase tracking-widest">
                 {selectedProject.title}
