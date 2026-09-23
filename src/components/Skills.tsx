@@ -89,15 +89,14 @@ const Skills = () => {
                   y1={skills[a].y}
                   x2={skills[b].x}
                   y2={skills[b].y}
-                  pathLength={1}
                   vectorEffect="non-scaling-stroke"
                   className={cn(
                     "transition-[stroke,stroke-width,opacity] duration-300",
                     lit ? "stroke-primary" : "stroke-muted-foreground",
                   )}
                   strokeWidth={lit ? 1.5 : 1}
-                  strokeDasharray={1}
-                  strokeDashoffset={revealed ? 0 : 1}
+                  strokeDasharray={2000}
+                  strokeDashoffset={revealed ? 0 : 2000}
                   style={{
                     opacity: dim ? 0.08 : lit ? 0.9 : 0.25,
                     transition: `stroke-dashoffset 1.4s cubic-bezier(0.22,1,0.36,1) ${i * 0.08}s, opacity 300ms, stroke 300ms`,
