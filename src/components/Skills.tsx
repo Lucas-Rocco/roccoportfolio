@@ -1,184 +1,203 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Code, Database, Cloud, Palette, Terminal, Layers, Cpu, Globe, Smartphone, Lock } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const skills = [
-  { icon: Code, name: "React", category: "Frontend", level: 95, description: "Componentes, Hooks, Context API, Redux" },
-  { icon: Globe, name: "Next.js", category: "Frontend", level: 90, description: "SSR, SSG, API Routes, App Router" },
-  { icon: Code, name: "TypeScript", category: "Frontend", level: 92, description: "Types, Generics, Interfaces" },
-  { icon: Database, name: "Node.js", category: "Backend", level: 88, description: "Express, Fastify, APIs RESTful" },
-  { icon: Database, name: "PostgreSQL", category: "Backend", level: 85, description: "Queries complexas, Otimização" },
-  { icon: Cloud, name: "AWS", category: "Cloud", level: 82, description: "EC2, S3, Lambda, CloudFront" },
-  { icon: Terminal, name: "Docker", category: "DevOps", level: 80, description: "Containers, Compose, Kubernetes" },
-  { icon: Palette, name: "Figma", category: "Design", level: 88, description: "UI/UX, Protótipos, Design Systems" },
-  { icon: Smartphone, name: "React Native", category: "Mobile", level: 78, description: "Apps iOS e Android, Expo" },
-  { icon: Layers, name: "GraphQL", category: "Backend", level: 75, description: "Apollo, Queries, Mutations" },
-  { icon: Lock, name: "Auth", category: "Security", level: 85, description: "JWT, OAuth, SSO, 2FA" },
-  { icon: Cpu, name: "Python", category: "Backend", level: 80, description: "Django, FastAPI, Data Science" },
+  { icon: Code, name: "React", category: "Frontend", level: 95, description: "Componentes, Hooks, Context API, Redux", x: 16, y: 34 },
+  { icon: Globe, name: "Next.js", category: "Frontend", level: 90, description: "SSR, SSG, API Routes, App Router", x: 29, y: 16 },
+  { icon: Code, name: "TypeScript", category: "Frontend", level: 92, description: "Types, Generics, Interfaces", x: 38, y: 42 },
+  { icon: Database, name: "Node.js", category: "Backend", level: 88, description: "Express, Fastify, APIs RESTful", x: 54, y: 24 },
+  { icon: Database, name: "PostgreSQL", category: "Backend", level: 85, description: "Queries complexas, Otimização", x: 69, y: 40 },
+  { icon: Cloud, name: "AWS", category: "Cloud", level: 82, description: "EC2, S3, Lambda, CloudFront", x: 80, y: 70 },
+  { icon: Terminal, name: "Docker", category: "DevOps", level: 80, description: "Containers, Compose, Kubernetes", x: 89, y: 46 },
+  { icon: Palette, name: "Figma", category: "Design", level: 88, description: "UI/UX, Protótipos, Design Systems", x: 12, y: 70 },
+  { icon: Smartphone, name: "React Native", category: "Mobile", level: 78, description: "Apps iOS e Android, Expo", x: 30, y: 82 },
+  { icon: Layers, name: "GraphQL", category: "Backend", level: 75, description: "Apollo, Queries, Mutations", x: 52, y: 58 },
+  { icon: Lock, name: "Auth", category: "Security", level: 85, description: "JWT, OAuth, SSO, 2FA", x: 58, y: 84 },
+  { icon: Cpu, name: "Python", category: "Backend", level: 80, description: "Django, FastAPI, Data Science", x: 82, y: 16 },
+];
+
+// Ligações da constelação (índices em `skills`)
+const links: [number, number][] = [
+  [0, 1], [0, 2], [1, 2], [2, 3], [3, 4], [3, 11], [4, 11], [4, 6], [6, 5],
+  [4, 9], [2, 9], [9, 10], [10, 5], [0, 7], [7, 8], [8, 10], [2, 8],
 ];
 
 const Skills = () => {
   const [activeSkill, setActiveSkill] = useState<number | null>(null);
-  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
+  const [revealed, setRevealed] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseEnter = (index: number, e: React.MouseEvent<HTMLDivElement>) => {
-    setActiveSkill(index);
-    const rect = e.currentTarget.getBoundingClientRect();
-    const containerRect = containerRef.current?.getBoundingClientRect();
-    if (containerRect) {
-      setTooltipPos({
-        x: rect.left + rect.width / 2 - containerRect.left,
-        y: rect.top - containerRect.top - 10,
-      });
-    }
-  };
+  useEffect(() => {
+    const node = containerRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setRevealed(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
-  const handleMouseLeave = () => {
-    setActiveSkill(null);
-    setTooltipPos(null);
-  };
+  const connected = useMemo(() => {
+    if (activeSkill === null) return null;
+    const set = new Set<number>([activeSkill]);
+    links.forEach(([a, b]) => {
+      if (a === activeSkill) set.add(b);
+      if (b === activeSkill) set.add(a);
+    });
+    return set;
+  }, [activeSkill]);
+
+  const active = activeSkill !== null ? skills[activeSkill] : null;
 
   return (
     <section id="skills" className="py-32 px-6 relative overflow-hidden">
       <div className="container mx-auto max-w-6xl">
-        {/* Section header */}
         <div className="text-center mb-16">
-          <span className="text-primary/70 text-sm font-medium uppercase tracking-widest">
-            Expertise
-          </span>
-          <h2 className="font-display text-4xl md:text-5xl font-bold mt-4 mb-6 text-foreground">
-            Habilidades
-          </h2>
+          <span className="text-primary/70 text-sm font-medium uppercase tracking-widest">Expertise</span>
+          <h2 className="font-display text-4xl md:text-5xl font-bold mt-4 mb-6 text-foreground">Habilidades</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Passe o mouse sobre as bolhas para descobrir mais
+            Uma constelação das tecnologias que uso — passe o mouse sobre uma estrela
           </p>
         </div>
 
-        {/* Spiral Galaxy Container */}
-        <div ref={containerRef} className="relative w-full aspect-square max-w-3xl mx-auto">
-          {/* Central Core - minimal */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 md:w-24 md:h-24">
-            <div className="absolute inset-0 rounded-full border border-border/30 bg-card/50 backdrop-blur-sm flex items-center justify-center">
-              <span className="font-display text-sm md:text-base font-medium text-muted-foreground">Skills</span>
-            </div>
-          </div>
+        <div
+          ref={containerRef}
+          className="relative mx-auto w-full max-w-5xl aspect-square md:aspect-[16/10]"
+          onMouseLeave={() => setActiveSkill(null)}
+        >
+          {/* Linhas da constelação */}
+          <svg
+            className="absolute inset-0 h-full w-full"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            {links.map(([a, b], i) => {
+              const lit = activeSkill !== null && (a === activeSkill || b === activeSkill);
+              const dim = activeSkill !== null && !lit;
+              return (
+                <line
+                  key={`${a}-${b}`}
+                  x1={skills[a].x}
+                  y1={skills[a].y}
+                  x2={skills[b].x}
+                  y2={skills[b].y}
+                  pathLength={1}
+                  vectorEffect="non-scaling-stroke"
+                  className={cn(
+                    "transition-[stroke,stroke-width,opacity] duration-300",
+                    lit ? "stroke-primary" : "stroke-muted-foreground",
+                  )}
+                  strokeWidth={lit ? 1.5 : 1}
+                  strokeDasharray={1}
+                  strokeDashoffset={revealed ? 0 : 1}
+                  style={{
+                    opacity: dim ? 0.08 : lit ? 0.9 : 0.25,
+                    transition: `stroke-dashoffset 1.4s cubic-bezier(0.22,1,0.36,1) ${i * 0.08}s, opacity 300ms, stroke 300ms`,
+                  }}
+                />
+              );
+            })}
+          </svg>
 
-          {/* Orbital Rings - very subtle */}
-          {[1, 2, 3].map((ring) => (
-            <div
-              key={ring}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-border/10"
-              style={{
-                width: `${ring * 30 + 20}%`,
-                height: `${ring * 30 + 20}%`,
-              }}
-            />
-          ))}
-
-          {/* Skill Bubbles */}
+          {/* Estrelas / habilidades */}
           {skills.map((skill, index) => {
-            const orbitIndex = Math.floor(index / 4);
-            const positionInOrbit = index % 4;
-            const orbitRadius = 120 + orbitIndex * 100;
-            const baseAngle = (positionInOrbit * 90) + (orbitIndex * 22.5);
-            const animationDelay = index * 0.5;
-            const animationDuration = 20 + orbitIndex * 5;
-            
+            const isActive = activeSkill === index;
+            const isDim = connected !== null && !connected.has(index);
             return (
-              <div
+              <button
                 key={skill.name}
-                className="absolute top-1/2 left-1/2 skill-orbit"
+                type="button"
+                aria-label={`${skill.name}: ${skill.category}, ${skill.level}%`}
+                onMouseEnter={() => setActiveSkill(index)}
+                onFocus={() => setActiveSkill(index)}
+                onBlur={() => setActiveSkill(null)}
+                onClick={() => setActiveSkill(isActive ? null : index)}
+                className={cn(
+                  "group absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2 rounded-full",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                  "transition-[opacity,transform] duration-500 ease-out",
+                  revealed ? "opacity-100 scale-100" : "opacity-0 scale-50",
+                  isDim && "opacity-30",
+                  isActive ? "z-30" : "z-10",
+                )}
                 style={{
-                  animation: `orbit ${animationDuration}s linear infinite`,
-                  animationDelay: `-${animationDelay}s`,
-                  transformOrigin: '0 0',
+                  left: `${skill.x}%`,
+                  top: `${skill.y}%`,
+                  transitionDelay: revealed && activeSkill === null ? `${index * 60}ms` : "0ms",
                 }}
               >
-                <div
-                  className={`
-                    relative -translate-x-1/2 -translate-y-1/2 cursor-pointer
-                    transition-all duration-300 ease-out
-                    ${activeSkill === index ? 'scale-125 z-50' : 'hover:scale-110 z-10'}
-                  `}
-                  style={{
-                    transform: `rotate(${baseAngle}deg) translateX(${orbitRadius}px) rotate(-${baseAngle}deg)`,
-                  }}
-                  onMouseEnter={(e) => handleMouseEnter(index, e)}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  {/* Bubble - clean monochrome */}
-                  <div
-                    className={`
-                      relative w-12 h-12 md:w-14 md:h-14 rounded-full
-                      border transition-all duration-300
-                      flex items-center justify-center backdrop-blur-sm
-                      ${activeSkill === index 
-                        ? 'bg-primary/10 border-primary/50 shadow-lg' 
-                        : 'bg-card/60 border-border/30 hover:border-border/50'}
-                    `}
-                    style={{
-                      animation: `float ${3 + (index % 3)}s ease-in-out infinite`,
-                      animationDelay: `${index * 0.2}s`,
-                    }}
+                <span className="relative flex items-center justify-center">
+                  {/* halo pulsante */}
+                  <span
+                    className={cn(
+                      "absolute h-14 w-14 md:h-16 md:w-16 rounded-full border transition-all duration-300",
+                      isActive ? "border-primary/50 bg-primary/10 scale-110" : "border-border/20 bg-transparent scale-90",
+                    )}
+                    style={{ animation: `pulse-glow ${3 + (index % 4)}s ease-in-out infinite`, animationDelay: `${index * 0.3}s` }}
+                  />
+                  <span
+                    className={cn(
+                      "relative flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full border backdrop-blur-sm transition-all duration-300",
+                      isActive
+                        ? "border-primary/60 bg-card shadow-[var(--shadow-glow)]"
+                        : "border-border/40 bg-card/70 group-hover:border-border/70",
+                    )}
                   >
-                    <skill.icon className={`w-5 h-5 md:w-6 md:h-6 transition-colors duration-300 ${
-                      activeSkill === index ? 'text-primary' : 'text-muted-foreground'
-                    }`} />
-                  </div>
-                </div>
-              </div>
+                    <skill.icon
+                      className={cn(
+                        "h-4 w-4 md:h-5 md:w-5 transition-colors duration-300",
+                        isActive ? "text-primary" : "text-muted-foreground",
+                      )}
+                    />
+                  </span>
+                </span>
+                <span
+                  className={cn(
+                    "hidden md:block whitespace-nowrap text-[11px] font-medium tracking-wide transition-colors duration-300",
+                    isActive ? "text-foreground" : "text-muted-foreground/70",
+                  )}
+                >
+                  {skill.name}
+                </span>
+              </button>
             );
           })}
 
-          {/* Tooltip - Fixed position above bubble */}
-          {activeSkill !== null && tooltipPos && (
+          {/* Info sempre acima (12h) */}
+          {active && (
             <div
-              className="absolute w-44 p-3 rounded-lg bg-card/95 backdrop-blur-md border border-border/50 shadow-xl z-[100] pointer-events-none"
+              key={active.name}
+              className="absolute z-[100] w-48 p-3 rounded-lg bg-card/95 backdrop-blur-md border border-border/50 shadow-xl pointer-events-none animate-[fade-in_200ms_ease-out]"
               style={{
-                left: tooltipPos.x,
-                top: tooltipPos.y,
-                transform: 'translate(-50%, -100%)',
+                left: `${active.x}%`,
+                top: `${active.y}%`,
+                transform: "translate(-50%, calc(-100% - 2.25rem))",
               }}
             >
-              {/* Arrow */}
               <div className="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-3 rotate-45 bg-card/95 border-r border-b border-border/50" />
-              
               <div className="relative">
                 <div className="flex items-center justify-between mb-1">
-                  <h4 className="font-medium text-foreground text-sm">
-                    {skills[activeSkill].name}
-                  </h4>
-                  <span className="text-xs text-muted-foreground">
-                    {skills[activeSkill].level}%
-                  </span>
+                  <h4 className="font-medium text-foreground text-sm">{active.name}</h4>
+                  <span className="text-xs text-muted-foreground">{active.level}%</span>
                 </div>
-                <span className="text-xs text-primary/70 mb-2 block">
-                  {skills[activeSkill].category}
-                </span>
-                <p className="text-xs text-muted-foreground">
-                  {skills[activeSkill].description}
-                </p>
+                <span className="text-xs text-primary/70 mb-2 block">{active.category}</span>
+                <p className="text-xs text-muted-foreground mb-2">{active.description}</p>
+                <div className="h-1 w-full overflow-hidden rounded-full bg-secondary">
+                  <div className="h-full rounded-full bg-primary" style={{ width: `${active.level}%` }} />
+                </div>
               </div>
             </div>
           )}
-          {/* Minimal floating particles */}
-          {[...Array(10)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute rounded-full bg-muted-foreground/20"
-              style={{
-                width: Math.random() * 3 + 1 + 'px',
-                height: Math.random() * 3 + 1 + 'px',
-                top: Math.random() * 100 + '%',
-                left: Math.random() * 100 + '%',
-                animation: `float ${4 + Math.random() * 4}s ease-in-out infinite`,
-                animationDelay: `${Math.random() * 4}s`,
-              }}
-            />
-          ))}
         </div>
 
-        {/* Stats below - cleaner */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-20">
           {[
             { value: "50+", label: "Projetos" },
@@ -186,16 +205,9 @@ const Skills = () => {
             { value: "5+", label: "Anos" },
             { value: "99%", label: "Satisfação" },
           ].map((stat) => (
-            <div
-              key={stat.label}
-              className="text-center p-6 rounded-xl border border-border/20 bg-card/30 backdrop-blur-sm"
-            >
-              <p className="font-display text-3xl md:text-4xl font-bold text-foreground mb-1">
-                {stat.value}
-              </p>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                {stat.label}
-              </p>
+            <div key={stat.label} className="text-center p-6 rounded-xl border border-border/20 bg-card/30 backdrop-blur-sm">
+              <p className="font-display text-3xl md:text-4xl font-bold text-foreground mb-1">{stat.value}</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">{stat.label}</p>
             </div>
           ))}
         </div>
