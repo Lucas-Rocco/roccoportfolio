@@ -196,20 +196,6 @@ const Skills = () => {
             </div>
           )}
         </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-20">
-          {[
-            { value: "50+", label: "Projetos" },
-            { value: "30+", label: "Clientes" },
-            { value: "5+", label: "Anos" },
-            { value: "99%", label: "Satisfação" },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center p-6 rounded-xl border border-border/20 bg-card/30 backdrop-blur-sm">
-              <p className="font-display text-3xl md:text-4xl font-bold text-foreground mb-1">{stat.value}</p>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">{stat.label}</p>
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   );
