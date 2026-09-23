@@ -233,6 +233,31 @@ const Projects = () => {
 
   useEffect(() => () => clearRouletteTimer(), []);
 
+  // Relógio único da roleta: a mesma variável gira o anel e desfaz o giro em cada card,
+  // assim os cards ficam sempre em pé, mesmo quando aparecem após trocar o filtro.
+  const spinRef = useRef<HTMLDivElement>(null);
+  const pausedRef = useRef(false);
+  pausedRef.current = rouletteHoveredId !== null;
+
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+    let frame = 0;
+    let last = performance.now();
+    let spin = 0;
+    const tick = (now: number) => {
+      const delta = now - last;
+      last = now;
+      if (!pausedRef.current) {
+        spin = (spin + (delta / 1000) * 4) % 360; // 4°/s = uma volta a cada 90s
+        spinRef.current?.style.setProperty("--spin", `${spin}deg`);
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
   useEffect(() => {
     if (!selectedProject && !previewProject) return;
 
@@ -424,7 +449,9 @@ const Projects = () => {
           <div className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle,hsl(var(--primary)/0.08)_0%,transparent_60%)]" aria-hidden="true" />
 
           <div
-            className={cn("roulette-spin absolute inset-0", rouletteHoveredId !== null && "[animation-play-state:paused]")}
+            ref={spinRef}
+            className="absolute inset-0"
+            style={{ transform: "rotate(var(--spin, 0deg))" }}
           >
             {rouletteProjects.map((project) => {
               const visible = rouletteIds.has(project.id);
@@ -445,12 +472,7 @@ const Projects = () => {
                       className="transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                       style={{ transform: `rotate(${-angle}deg)` }}
                     >
-                      <div
-                        className={cn(
-                          "roulette-counter-spin",
-                          rouletteHoveredId !== null && "[animation-play-state:paused]",
-                        )}
-                      >
+                      <div style={{ transform: "rotate(calc(var(--spin, 0deg) * -1))" }}>
                         <button
                           type="button"
                           tabIndex={visible ? 0 : -1}
