@@ -400,19 +400,26 @@ const Projects = () => {
                     <span className="text-xs text-muted-foreground">
                       Área: <span className="text-foreground/80">{project.area}</span>
                     </span>
-                    <Button type="button" size="sm" onClick={() => setSelectedProject(project)}>
-                      Ver projeto <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-                    </Button>
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between md:hidden">
+                <div className="mt-4 flex items-center justify-between gap-3">
                   <div className="flex flex-wrap gap-1.5">
                     {project.technologies.slice(0, 3).map((technology) => (
                       <span key={technology} className="text-xs text-muted-foreground">{technology}</span>
                     ))}
                   </div>
-                  <ArrowUpRight className="h-4 w-4 text-primary" aria-hidden="true" />
+                  <Button asChild size="sm" className="shrink-0">
+                    <a
+                      href={project.live ?? project.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(event) => event.stopPropagation()}
+                      onKeyDown={(event) => event.stopPropagation()}
+                    >
+                      Ver projeto <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                    </a>
+                  </Button>
                 </div>
               </div>
             </article>
@@ -648,6 +655,13 @@ const Projects = () => {
             </Button>
 
             <div className="relative min-h-64 overflow-hidden md:min-h-[520px]" style={{ background: selectedProject.image }}>
+              {selectedProject.previewImage && (
+                <img
+                  src={selectedProject.previewImage}
+                  alt={`Tela desktop do projeto ${selectedProject.title}`}
+                  className="absolute inset-0 h-full w-full object-cover object-top"
+                />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-background/10" />
               <span className="absolute bottom-8 left-8 font-display text-3xl font-bold text-primary-foreground/30 uppercase tracking-widest">
                 {selectedProject.title}
@@ -684,18 +698,31 @@ const Projects = () => {
               </div>
 
               <div className="mt-8 flex flex-wrap gap-3">
-                <Button asChild>
+                {(selectedProject.live || selectedProject.desktopApp) && (
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      const project = selectedProject;
+                      clearRouletteTimer();
+                      setSelectedProject(null);
+                      setPreviewProject(project);
+                    }}
+                  >
+                    <ArrowUpRight className="h-4 w-4" /> Ver projeto
+                  </Button>
+                )}
+                {selectedProject.live && (
+                  <Button asChild variant="outline">
+                    <a href={selectedProject.live} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4" /> Abrir site
+                    </a>
+                  </Button>
+                )}
+                <Button asChild variant={selectedProject.live || selectedProject.desktopApp ? "outline" : "default"}>
                   <a href={selectedProject.github} target="_blank" rel="noopener noreferrer">
                     <Github className="h-4 w-4" /> GitHub
                   </a>
                 </Button>
-                {selectedProject.live && (
-                  <Button asChild variant="outline">
-                    <a href={selectedProject.live} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="h-4 w-4" /> Demo
-                    </a>
-                  </Button>
-                )}
               </div>
             </div>
           </div>
